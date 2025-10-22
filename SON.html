@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bileşiğin Günlük Hayattaki Adı Nedir?</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Georgia', serif;
+    background-image: url('https://images.unsplash.com/photo-1600431521340-491eca880813?auto=format&fit=crop&w=1950&q=80');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    color: #fff;
+  }
+
+  .overlay { background-color: rgba(0,0,0,0.45); position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+  .game-container {
+    position: relative;
+    z-index: 2;
+    background-color: rgba(20, 10, 5, 0.7);
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(255,255,255,0.2);
+    max-width: 600px;
+    width: 90%;
+  }
+
+  h1 {
+    color: #ffda9b;
+    font-size: 1.8em;
+    margin-bottom: 25px;
+    text-shadow: 2px 2px 6px #000;
+  }
+
+  .formula {
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    color: #fff8dc;
+    text-shadow: 0 0 6px #000;
+    display: inline-block;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+  }
+
+  .options { display: flex; justify-content: center; flex-wrap: wrap; gap: 25px; }
+
+  .option {
+    background-image: url('https://cdn.pixabay.com/photo/2013/07/12/18/20/paper-153872_1280.png');
+    background-size: cover;
+    background-position: center;
+    border: 2px solid #a37b43;
+    border-radius: 12px;
+    padding: 20px 40px;
+    width: 230px;
+    font-size: 1.2em;
+    color: #2b1800;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff9e0;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, opacity 0.5s;
+  }
+
+  .option:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,255,200,0.6); }
+
+  .correct { box-shadow: 0 0 25px 7px rgba(0,255,0,0.8); }
+  .wrong { box-shadow: 0 0 25px 7px rgba(255,0,0,0.8); }
+
+  .scoreboard {
+    position: absolute; top: 15px; right: 20px;
+    background-color: rgba(0,0,0,0.5);
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 1em;
+    text-align: center;
+    z-index: 3;
+  }
+
+  .credit {
+    position: absolute; bottom: 15px; left: 15px;
+    background-color: rgba(0,0,0,0.5);
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 0.9em;
+    z-index: 3;
+  }
+
+  @keyframes glassBreak {
+    0% { transform: rotate(0deg) scale(1); opacity: 1; }
+    30% { transform: rotate(10deg) scale(1.1); opacity: 0.8; }
+    60% { transform: rotate(-10deg) scale(1.2); opacity: 0.6; }
+    100% { transform: rotate(0deg) scale(1); opacity: 1; }
+  }
+
+  .glass-break { animation: glassBreak 0.6s ease forwards; }
+</style>
+</head>
+<body>
+<div class="overlay"></div>
+<div class="game-container">
+  <h1>🧪 Bileşiğin günlük hayattaki adı nedir?</h1>
+  <div class="formula" id="formula">NaCl</div>
+  <div class="options">
+    <button class="option" id="option1"></button>
+    <button class="option" id="option2"></button>
+  </div>
+</div>
+
+<div class="scoreboard" id="scoreboard">Doğru: 0 | Yanlış: 0</div>
+<div class="credit">UTKU ANIL KAYA & EMİR ANIL BOZKURT tarafından yapıldı</div>
+
+<audio id="bgm" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_6ee5d35a1b.mp3?filename=happy-background-music-loop-11233.mp3" autoplay loop></audio>
+<audio id="ding" src="https://cdn.pixabay.com/download/audio/2022/03/14/audio_9d45e1d8b2.mp3?filename=correct-answer-124645.mp3"></audio>
+<audio id="buzzer" src="https://cdn.pixabay.com/download/audio/2022/03/14/audio_d9e6b9b47a.mp3?filename=wrong-answer-124646.mp3"></audio>
+
+<script>
+const compounds = [
+  { formula: "HCl", name: "Tuz Ruhu" },
+  { formula: "NaCl", name: "Sofra Tuzu" },
+  { formula: "H2SO4", name: "Zaç Yağı" },
+  { formula: "NaOH", name: "Sud Kostik" },
+  { formula: "CH3COOH", name: "Asetik Asit" },
+  { formula: "NH3", name: "Amonyak" },
+  { formula: "H2O", name: "Su" },
+  { formula: "CO2", name: "Karbondioksit" },
+  { formula: "O2", name: "Oksijen" },
+  { formula: "N2", name: "Azot" },
+  { formula: "CaCO3", name: "Kireç Taşı" },
+  { formula: "NaHCO3", name: "Kabartma Tozu" },
+  { formula: "C6H12O6", name: "Glikoz" },
+  { formula: "H2O2", name: "Oksijenli Su" },
+  { formula: "Na2CO3", name: "Soda" },
+  { formula: "Fe2O3", name: "Pas" },
+  { formula: "HNO3", name: "Kezzap" },
+  { formula: "Ca(OH)2", name: "Sönmüş Kireç" },
+  { formula: "MgSO4", name: "Epsom Tuzu" },
+  { formula: "KNO3", name: "Güherçile" },
+  { formula: "C2H5OH", name: "Etil Alkol" },
+  { formula: "NaClO", name: "Çamaşır Suyu" },
+  { formula: "H3PO4", name: "Fosforik Asit" },
+  { formula: "HBr", name: "Hidrojen Bromür" },
+  { formula: "HF", name: "Hidrojen Florür" },
+  { formula: "LiOH", name: "Lityum Hidroksit" },
+  { formula: "KOH", name: "Potasyum Hidroksit" },
+  { formula: "AgNO3", name: "Gümüş Nitrat" },
+  { formula: "CuSO4", name: "Bakır Sülfat" },
+  { formula: "ZnO", name: "Çinko Oksit" }
+];
+
+let currentQuestion;
+let correctCount = 0;
+let wrongCount = 0;
+
+function loadQuestion() {
+  const formulaEl = document.getElementById("formula");
+  const opt1 = document.getElementById("option1");
+  const opt2 = document.getElementById("option2");
+
+  formulaEl.classList.add("glass-break");
+  opt1.classList.add("glass-break");
+  opt2.classList.add("glass-break");
+
+  setTimeout(() => {
+    formulaEl.classList.remove("glass-break");
+    opt1.classList.remove("glass-break");
+    opt2.classList.remove("glass-break");
+
+    const randomIndex = Math.floor(Math.random() * compounds.length);
+    currentQuestion = compounds[randomIndex];
+    formulaEl.textContent = currentQuestion.formula;
+
+    let wrongIndex;
+    do { wrongIndex = Math.floor(Math.random() * compounds.length); }
+    while (wrongIndex === randomIndex);
+
+    const options = [currentQuestion.name, compounds[wrongIndex].name];
+    options.sort(() => Math.random() - 0.5);
+
+    opt1.textContent = options[0];
+    opt2.textContent = options[1];
+
+    opt1.disabled = false;
+    opt2.disabled = false;
+
+    opt1.onclick = (e) => checkAnswer(options[0], e.target);
+    opt2.onclick = (e) => checkAnswer(options[1], e.target);
+  }, 400);
+}
+
+function checkAnswer(selected, button) {
+  const buttons = document.querySelectorAll(".option");
+  buttons.forEach(btn => btn.disabled = true);
+
+  if (selected === currentQuestion.name) {
+    button.classList.add("correct");
+    correctCount++;
+    document.getElementById("ding").play();
+  } else {
+    button.classList.add("wrong");
+    wrongCount++;
+    document.getElementById("buzzer").play();
+  }
+
+  updateScore();
+
+  setTimeout(() => {
+    buttons.forEach(btn => { btn.classList.remove("correct","wrong"); });
+    loadQuestion();
+  }, 1000);
+}
+
+function updateScore() {
+  const scoreboard = document.getElementById("scoreboard");
+  scoreboard.textContent = `Doğru: ${correctCount} | Yanlış: ${wrongCount}`;
+}
+
+loadQuestion();
+</script>
+</body>
+</html>
